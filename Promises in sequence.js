@@ -18,40 +18,43 @@ const tasks = [
   createAsyncTask,
 ];
 const taskRunnerIterative = async (tasks, cb) => {
-  let result = [];
-  let error = [];
-  for (let task of tasks) {
-    try {
-      const c = await task();
-      result.push(c);
-    } catch (e) {
-      error.push(e);
+  let results = [];
+  let errors =  [];
+
+  for(let task of tasks){
+    try{
+      const res = await task();
+      results.push(res);
+    }
+    catch(e){
+      errors.push(e);
     }
   }
+  cb(results,errors);
 
-  cb(result, error);
 };
 const taskRunnerRecursion = (tasks, cb) => {
-  let result = [];
-  let error = [];
+   let results = [];
+  let errors =  [];
 
-  const helper = (index) => {
-    if (index === tasks.length) {
-      cb(result, error);
+  const helper  =async function(index){
+    if(index === tasks.length){
+      return cb(results,errors);
     }
-    tasks[index]()
-      .then((res) => {
-        result.push(res);
-      })
-      .catch((err) => {
-        error.push(err);
-      })
-      .finally(() => {
-        helper(index + 1);
-      });
-  };
+    tasks[index]().then((res)=>{
+      results.push(res);
+    }).catch((err)=>{
+       errors.push(err);
+    }).finally(()=>{
+      helper(index+1);
+    })
+
+    helper(tasks,index+1);
+  }
+  
 
   helper(0);
+  
 };
 taskRunnerIterative(tasks, (result, err) => console.log(result, err));
 taskRunnerRecursion(tasks, (result, err) => console.log(result, err));
