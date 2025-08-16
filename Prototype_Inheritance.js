@@ -7,7 +7,7 @@ Person.prototype.hello = function(){
 }
 
 function Dev(name,title){
-    this.name = name;
+  Person.call(this, name);
     this.title = title;
 }
 
